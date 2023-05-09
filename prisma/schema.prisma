@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model WarehouseAdmin {
+  id       Int    @id @default(autoincrement())
+  name     String
+  username String
+  password String
+
+  stockTransfers StockTransfer[]
+}
+
+model Technician {
+  id   Int    @id @default(autoincrement())
+  nik  String @unique @db.VarChar(255)
+  name String
+
+  stockTransfers StockTransfer[]
+}
+
+model StockTransfer {
+  id               Int      @id @default(autoincrement())
+  date             DateTime @default(now())
+  warehouseAdminId Int
+  technicianId     Int
+  nik              String   @db.VarChar(255)
+
+  technician     Technician     @relation(fields: [technicianId], references: [id])
+  warehouseAdmin WarehouseAdmin @relation(fields: [warehouseAdminId], references: [id])
+  details        Detail[]
+
+  @@index([technicianId, nik], name: "technician_nik_index")
+
+}
+
+model Stock {
+  id       Int    @id @default(autoincrement())
+  name     String
+  quantity Int
+
+  details Detail[]
+}
+
+model Detail {
+  id            Int      @id @default(autoincrement())
+  stockTransferId Int
+  stockId       Int
+  quantity      Int
+
+  stock Stock @relation(fields: [stockId], references: [id])
+  stockTransfer StockTransfer @relation(fields: [stockTransferId], references: [id])
+}
