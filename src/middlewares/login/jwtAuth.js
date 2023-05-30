@@ -8,19 +8,18 @@ router.use((req, res, next) => {
   const authHeader = req.headers.authorization
   const token = authHeader && authHeader.split(' ')[1]
 
-  if (token === null) {
+  if (!token) {
     res.status(401).send(responseError(401, 'UNAUTHORIZED', 'ACCESS DENIED'))
     return
   }
 
-  // Verify JWT
-  jwt.verify(token, process.env.ACCESS_KEY, (err) => {
-    if (err) {
-      res.status(403).send(responseError(403, 'FORBIDDEN', 'ACCESS FORBIDDEN'))
-    } else {
-      next()
-    }
-  })
+  try {
+    // Verify JWT
+    jwt.verify(token, process.env.ACCESS_KEY)
+    next()
+  } catch (error) {
+    res.status(403).send(responseError(403, 'FORBIDDEN', 'ACCESS FORBIDDEN'))
+  }
 })
 
 module.exports = router

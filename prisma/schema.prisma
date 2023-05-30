@@ -10,7 +10,7 @@ datasource db {
 model WarehouseAdmin {
   id       Int    @id @default(autoincrement())
   name     String
-  username String
+  username String @unique @db.VarChar(255)
   password String
 
   stockTransfers StockTransfer[]
