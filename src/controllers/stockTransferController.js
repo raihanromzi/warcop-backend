@@ -168,6 +168,16 @@ exports.createStockTransfer = async (req, res) => {
       },
     })
 
+    // Update the stock quantities
+    for (const detail of createdStockTransfer.details) {
+      await prisma.stock.update({
+        where: { id: detail.stock.id },
+        data: {
+          quantity: detail.stock.quantity - detail.quantity,
+        },
+      })
+    }
+
     const response = {
       technicianName: createdStockTransfer.technician.name,
       technicianId: createdStockTransfer.technicianId,
